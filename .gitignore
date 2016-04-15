@@ -1,6 +1,5 @@
 node_modules
 IrcBot/token.txt
-IrcBot
-Websocket
+Websocket/index.html
 .vscode
 APIServer
