@@ -1,4 +1,6 @@
 # APIReactApp
-Golang / React + Redux / RethingDB | Learning
+Golang (Backend)
+React + Redux (Frontend)
+RethingDB (Database)
 
 Trying to learn a thing or two :)
