@@ -1,0 +1,6 @@
+node_modules
+IrcBot/token.txt
+IrcBot
+Websocket
+.vscode
+APIServer
