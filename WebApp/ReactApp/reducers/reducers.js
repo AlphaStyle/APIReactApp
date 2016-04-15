@@ -1,28 +1,43 @@
 import { SIDE_NAV, EDIT_MODE, ADD_BLOG, EDIT_BLOG, DELETE_BLOG, ADD_CHAT } from '../actions/actions';
 
+require('es6-promise').polyfill();
+var superagentPromisePlugin = require('superagent-promise-plugin');
+var request = superagentPromisePlugin.patch(require('superagent'));
+
+
+
 function getInit() {
-  return {
-    blogs:
-    [
-      {
-        author:'Code More!',
-        title: 'this is stitle',
-        content: 'this is content',
-        id: 0,
-      },
-    ],
-    chat:
-    [
-      {
-        text: 'nice',
-      },
-    ],
-    edit: false,
-    sideNav: false,
-  };
+  return request.get('/api/GetBlogs/')
+  .use(superagentPromisePlugin)
+  .then(function (res) {
+        return {
+          blogs:
+          [
+            {
+              author:'Code More!',
+              title: 'this is stitle',
+              content: 'this is content',
+              id: 0,
+            },
+          ],
+          chat:
+          [
+            {
+              text: 'nice',
+            },
+          ],
+          edit: false,
+          sideNav: false,
+        };
+    }
+  )
+  .catch(function (err) {
+    throw(err);
+  });
 }
  
 function blogReducer(state = getInit(), action) {
+  console.log(state);
   switch (action.type) {
     case ADD_BLOG:
       return Object.assign({}, state,
