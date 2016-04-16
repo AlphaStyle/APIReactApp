@@ -27231,6 +27231,12 @@
 	
 	function getInit() {
 	  return {
+	    blogs: [{
+	      author: '',
+	      title: '',
+	      content: '',
+	      id: 0
+	    }],
 	    chat: [{
 	      text: 'nice'
 	    }],
@@ -27270,7 +27276,6 @@
 	      state.blogs[action.id].author = action.author;
 	      state.blogs[action.id].title = action.title;
 	      state.blogs[action.id].content = action.content;
-	      state.blogs[action.id].id = action.id;
 	      return Object.assign({}, state, {
 	        blogs: [].concat(_toConsumableArray(state.blogs))
 	      });
@@ -27334,7 +27339,7 @@
 	var FETCH_BLOGS = exports.FETCH_BLOGS = 'FETCH_BLOGS';
 	var ADD_BLOG_ONCE = exports.ADD_BLOG_ONCE = 'ADD_BLOG_ONCE';
 	
-	var id = 1;
+	var id = 2;
 	function addBlog(author, title, content) {
 	  return {
 	    type: ADD_BLOG,
@@ -27407,7 +27412,7 @@
   \*******************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;var require;/* WEBPACK VAR INJECTION */(function(process, global, module) {/*!
+	var require;var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(process, global, module) {/*!
 	 * @overview es6-promise - a tiny implementation of Promises/A+.
 	 * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
 	 * @license   Licensed under MIT license
@@ -28832,6 +28837,8 @@
 	
 	var _react2 = _interopRequireDefault(_react);
 	
+	var _reactRedux = __webpack_require__(/*! react-redux */ 166);
+	
 	var _BlogCreate = __webpack_require__(/*! ./BlogCreate */ 250);
 	
 	var _BlogCreate2 = _interopRequireDefault(_BlogCreate);
@@ -28840,9 +28847,37 @@
 	
 	var _BlogList2 = _interopRequireDefault(_BlogList);
 	
+	var _actions = __webpack_require__(/*! ../actions/actions */ 242);
+	
+	var _es6Promise = __webpack_require__(/*! es6-promise */ 243);
+	
+	var _es6Promise2 = _interopRequireDefault(_es6Promise);
+	
+	__webpack_require__(/*! isomorphic-fetch */ 247);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var BlogApp = function BlogApp() {
+	var BlogApp = function BlogApp(_ref) {
+	  var dispatch = _ref.dispatch;
+	  var getBlogs = _ref.getBlogs;
+	
+	
+	  var handleFetchBlogs = function handleFetchBlogs() {
+	    fetch("/api/GetBlogs/").then(function (response) {
+	      if (response.status >= 400) {
+	        throw new Error("Bad response from server");
+	      }
+	      return response.json();
+	    }).then(function (json) {
+	      console.log(json);
+	      dispatch((0, _actions.addBlogOnce)(json.Author, json.Title, json.Content, json.ID));
+	    });
+	  };
+	
+	  if (getBlogs) {
+	    handleFetchBlogs();
+	  }
+	
 	  return _react2.default.createElement(
 	    'div',
 	    null,
@@ -28850,6 +28885,14 @@
 	    _react2.default.createElement(_BlogList2.default, null)
 	  );
 	};
+	
+	function mapStateToProps(state) {
+	  return {
+	    getBlogs: state.fetchBlogs
+	  };
+	}
+	
+	BlogApp = (0, _reactRedux.connect)(mapStateToProps)(BlogApp);
 	
 	exports.default = BlogApp;
 
@@ -40459,7 +40502,6 @@
 	
 	var BlogList = function BlogList(_ref) {
 	  var blogs = _ref.blogs;
-	  var dispatch = _ref.dispatch;
 	
 	  var style = {
 	    width: 500
@@ -40471,7 +40513,9 @@
 	    _react2.default.createElement(
 	      'ul',
 	      null,
-	      blogs.map(function (listValue, index) {
+	      blogs.sort(function (a, b) {
+	        return b.id - a.id;
+	      }).map(function (listValue, index) {
 	        return _react2.default.createElement(
 	          _card2.default,
 	          { key: index, style: style },
@@ -40504,8 +40548,7 @@
 	
 	function mapStateToProps(state) {
 	  return {
-	    blogs: state.blogs,
-	    getBlogs: state.fetchBlogs
+	    blogs: state.blogs
 	  };
 	}
 	
@@ -46458,34 +46501,12 @@
 	
 	var _reactRouter = __webpack_require__(/*! react-router */ 185);
 	
-	var _es6Promise = __webpack_require__(/*! es6-promise */ 243);
-	
-	var _es6Promise2 = _interopRequireDefault(_es6Promise);
-	
-	__webpack_require__(/*! isomorphic-fetch */ 247);
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var SideNav = function SideNav(_ref) {
 	  var dispatch = _ref.dispatch;
 	  var sideNav = _ref.sideNav;
-	  var getBlogs = _ref.getBlogs;
 	
-	
-	  var handleFetchBlogs = function handleFetchBlogs() {
-	    fetch("/api/GetBlogs/").then(function (response) {
-	      if (response.status >= 400) {
-	        throw new Error("Bad response from server");
-	      }
-	      return response.json();
-	    }).then(function (json) {
-	      dispatch((0, _actions.addBlogOnce)(json.Author, json.Title, json.Content, json.ID));
-	    });
-	  };
-	
-	  if (getBlogs) {
-	    handleFetchBlogs();
-	  }
 	
 	  var handleOpen = function handleOpen() {
 	    dispatch((0, _actions.toggleSideNav)(true));
@@ -46555,8 +46576,7 @@
 	
 	function mapStateToProps(state) {
 	  return {
-	    sideNav: state.sideNav,
-	    getBlogs: state.fetchBlogs
+	    sideNav: state.sideNav
 	  };
 	}
 	

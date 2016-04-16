@@ -7,8 +7,7 @@ export const SIDE_NAV = 'SIDE_NAV';
 export const FETCH_BLOGS = 'FETCH_BLOGS';
 export const ADD_BLOG_ONCE = 'ADD_BLOG_ONCE';
 
-
-let id = 1;
+let id = 2;
 export function addBlog(author, title, content) {
   return {
     type: ADD_BLOG,

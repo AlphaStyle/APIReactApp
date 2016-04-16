@@ -7,7 +7,8 @@ import CardHeader from 'material-ui/lib/card/card-header';
 import CardText from 'material-ui/lib/card/card-text';
 import BlogEdit from './BlogEdit';
 
-let BlogList = ({ blogs, dispatch }) => {
+
+let BlogList = ({ blogs }) => {
   const style = {
     width: 500,
   };
@@ -15,7 +16,7 @@ let BlogList = ({ blogs, dispatch }) => {
   return (
     <div> 
       <ul>
-        {blogs.map(function (listValue, index) {
+        {blogs.sort((a,b) => b.id-a.id).map(function (listValue, index) {
           return (
             <Card key={index} style={style}>
               <CardHeader
@@ -46,7 +47,6 @@ let BlogList = ({ blogs, dispatch }) => {
 function mapStateToProps(state) {
   return {
     blogs: state.blogs,
-    getBlogs: state.fetchBlogs,
   };
 }
 

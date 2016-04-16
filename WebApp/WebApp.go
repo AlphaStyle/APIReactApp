@@ -81,10 +81,10 @@ func main() {
 
 // Blog is the blog struct
 type Blog struct {
-	Author  string
-	Title   string
-	Content string
-	ID      int
+	Author  string `gorethink:"author"`
+	Title   string `gorethink:"title"`
+	Content string `gorethink:"content"`
+	ID      int    `gorethink:"id"`
 }
 
 // GetBlogs is the API call to get all blogs
@@ -92,8 +92,9 @@ func GetBlogs(w http.ResponseWriter, r *http.Request) {
 	// Set header to JSON
 	w.Header().Set("Content-Type", "application/json")
 
-	b := Blog{"Author goes here", "Title goes here", "Content this is content", 0}
+	b := Blog{"Author goes here", "Title goes here", "Content this is content", 1}
 
+	// Send it as JSON
 	blog, err := json.Marshal(b)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -106,6 +107,7 @@ func GetBlogs(w http.ResponseWriter, r *http.Request) {
 func AddBlog(w http.ResponseWriter, r *http.Request) {
 	// Set header to JSON
 	w.Header().Set("Content-Type", "application/json")
+
 	fmt.Fprintln(w, "AddBlog")
 }
 

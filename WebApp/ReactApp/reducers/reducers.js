@@ -2,6 +2,15 @@ import { ADD_BLOG_ONCE, FETCH_BLOGS, SIDE_NAV, EDIT_MODE, ADD_BLOG, EDIT_BLOG, D
 
 function getInit() {
   return {
+    blogs: 
+    [
+      {
+        author: '',
+        title: '',
+        content: '',
+        id: 0,
+      },
+    ],
     chat:
     [
       {
@@ -51,7 +60,6 @@ function blogReducer(state = getInit(), action) {
       state.blogs[action.id].author = action.author;
       state.blogs[action.id].title = action.title;
       state.blogs[action.id].content = action.content;
-      state.blogs[action.id].id = action.id;
       return Object.assign({}, state,
         {
           blogs:
