@@ -3,10 +3,10 @@ import BlogCreate from './BlogCreate';
 import BlogList from './BlogList';
 
 const BlogApp = () => (
-  <div>
-    <BlogCreate />
-    <BlogList/>
-  </div>
-);
+    <div>
+      <BlogCreate />
+      <BlogList/>
+    </div>
+  );
 
 export default BlogApp; 

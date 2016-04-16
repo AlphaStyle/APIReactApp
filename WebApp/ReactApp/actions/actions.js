@@ -4,6 +4,9 @@ export const DELETE_BLOG = 'DELETE_BLOG';
 export const ADD_CHAT = 'ADD_CHAT';
 export const EDIT_MODE = 'EDIT_MODE';
 export const SIDE_NAV = 'SIDE_NAV';
+export const FETCH_BLOGS = 'FETCH_BLOGS';
+export const ADD_BLOG_ONCE = 'ADD_BLOG_ONCE';
+
 
 let id = 1;
 export function addBlog(author, title, content) {
@@ -13,6 +16,16 @@ export function addBlog(author, title, content) {
     title,
     content,
     id: id++,
+  };
+}
+
+export function addBlogOnce(author, title, content, id) {
+  return {
+    type: ADD_BLOG_ONCE,
+    author,
+    title,
+    content,
+    id,
   };
 }
 
@@ -51,5 +64,12 @@ export function deleteBlog(id) {
   return {
     type: DELETE_BLOG,
     id,
+  };
+}
+
+export function fetchBlogs(getBlogs) {
+  return {
+    type: FETCH_BLOGS,
+    getBlogs,
   };
 }

@@ -11,6 +11,7 @@ let BlogList = ({ blogs, dispatch }) => {
   const style = {
     width: 500,
   };
+  
   return (
     <div> 
       <ul>
@@ -45,6 +46,7 @@ let BlogList = ({ blogs, dispatch }) => {
 function mapStateToProps(state) {
   return {
     blogs: state.blogs,
+    getBlogs: state.fetchBlogs,
   };
 }
 
