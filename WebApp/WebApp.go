@@ -10,35 +10,6 @@ import (
 	r "github.com/dancannon/gorethink"
 )
 
-// Connecting to the Database "RethinkDB"
-func init() {
-	// Session
-	var session *r.Session
-
-	// Connecting to the database
-	session, err := r.Connect(r.ConnectOpts{
-		Address:  "localhost:28015",
-		Database: "api",
-	})
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	// Testing only......
-	res, err := r.Expr("Hello World").Run(session)
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-
-	var response string
-	err = res.One(&response)
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-
-	fmt.Println(response)
-}
-
 // Home handle the Home Page -> '/'
 func Home(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%s - Connected \n", r.Host)
@@ -57,42 +28,60 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DBSession makes the session global
+type DBSession struct {
+	DB *r.Session
+}
+
 func main() {
+	// Connecting to the database
+	session, err := r.Connect(r.ConnectOpts{
+		Address: "localhost:28015",
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	// Make the session global
+	db := DBSession{session}
+
 	// Handling Home Page -> /
 	// Serving the javascript file
 	http.HandleFunc("/", Home)
 	http.Handle("/build/", http.StripPrefix("/build/", http.FileServer(http.Dir("./ReactApp/build/"))))
 
 	// API Calls
-	http.HandleFunc("/api/Login/", Login)
-	http.HandleFunc("/api/Logout/", Logout)
-	http.HandleFunc("/api/Register/", Register)
-	http.HandleFunc("/api/GetBlogs/", GetBlogs)
-	http.HandleFunc("/api/AddBlog/", AddBlog)
+	http.HandleFunc("/api/Login/", db.Login)
+	http.HandleFunc("/api/Logout/", db.Logout)
+	http.HandleFunc("/api/Register/", db.Register)
+	http.HandleFunc("/api/GetBlogs/", db.GetBlogs)
+	http.HandleFunc("/api/AddBlog/", db.AddBlog)
 
 	// Server hosted at localhost:8000
-	err := http.ListenAndServe(":8000", nil)
+	err = http.ListenAndServe(":8000", nil)
 	if err != nil {
-		log.Fatal("Localhost:800 crashed \n", err)
+		log.Fatal("Localhost:8000 crashed \n", err)
 	}
 }
-
-// --------------------------------- API calls ---------------------------------------------
 
 // Blog is the blog struct
 type Blog struct {
 	Author  string `gorethink:"author"`
 	Title   string `gorethink:"title"`
 	Content string `gorethink:"content"`
-	ID      int    `gorethink:"id"`
+}
+
+// Blogs is the blogs struct
+type Blogs struct {
+	ID   int `gorethink:"id"`
+	Blog `gorethink:"blogs"`
 }
 
 // GetBlogs is the API call to get all blogs
-func GetBlogs(w http.ResponseWriter, r *http.Request) {
+func (db DBSession) GetBlogs(w http.ResponseWriter, res *http.Request) {
 	// Set header to JSON
 	w.Header().Set("Content-Type", "application/json")
 
-	b := Blog{"Author goes here", "Title goes here", "Content this is content", 1}
+	b := Blog{"Author goes here", "Title goes here", "Content this is content"}
 
 	// Send it as JSON
 	blog, err := json.Marshal(b)
@@ -104,29 +93,49 @@ func GetBlogs(w http.ResponseWriter, r *http.Request) {
 }
 
 // AddBlog is the API call toget all blogs
-func AddBlog(w http.ResponseWriter, r *http.Request) {
+func (db DBSession) AddBlog(w http.ResponseWriter, res *http.Request) {
 	// Set header to JSON
 	w.Header().Set("Content-Type", "application/json")
 
-	fmt.Fprintln(w, "AddBlog")
+	// Getting the JSON sent from Frontend
+	// And then decoding the JSON to Blog Struct
+	var b Blogs
+	blogJSON := json.NewDecoder(res.Body)
+	blogJSON.Decode(&b)
+	fmt.Printf("%v \n", b)
+
+	// Adding the JSON / Blog Struct to RethingDB
+	resp, err := r.DB("api").Table("blogs").Insert(Blogs{
+		ID: b.ID,
+		Blog: Blog{
+			Author:  b.Author,
+			Title:   b.Title,
+			Content: b.Content,
+		}}).RunWrite(db.DB)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	fmt.Printf("%d row inserted \n", resp.Inserted)
 }
 
 // Register is the Register API call
-func Register(w http.ResponseWriter, r *http.Request) {
+func (db DBSession) Register(w http.ResponseWriter, r *http.Request) {
 	// Set header to JSON
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintln(w, "Register")
 }
 
 // Login is the Login API call
-func Login(w http.ResponseWriter, r *http.Request) {
+func (db DBSession) Login(w http.ResponseWriter, r *http.Request) {
 	// Set header to JSON
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintln(w, "Login")
 }
 
 // Logout is the Logout API call
-func Logout(w http.ResponseWriter, r *http.Request) {
+func (db DBSession) Logout(w http.ResponseWriter, r *http.Request) {
 	// Set header to JSON
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintln(w, "Logout")

@@ -27,6 +27,19 @@ function blogReducer(state = getInit(), action) {
   console.log(state);
   switch (action.type) {
     case ADD_BLOG:
+    fetch('/api/AddBlog/', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        Author: action.author,
+        Title: action.title,
+        Content: action.content,
+        ID: action.id,
+        }) 
+      });
       return Object.assign({}, state,
         {
           blogs:

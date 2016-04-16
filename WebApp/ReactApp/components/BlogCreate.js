@@ -13,7 +13,7 @@ let BlogCreate = ({ dispatch }) => {
   const styleWidth = {
     width: 500,
   };
-
+  
   return (
     <div style={style}>
       <TextField style={styleWidth} id='addAuthor'
@@ -35,7 +35,7 @@ let BlogCreate = ({ dispatch }) => {
       <div> 
       <RaisedButton label="Publish" primary={true}
       onMouseDown={() => {
-        dispatch(addBlog(addAuthor.value, addTitle.value, addContent.value));
+        dispatch(addBlog(addAuthor.value, addTitle.value, addContent.value));         
         addAuthor.value = '';
         addTitle.value = '';
         addContent.value = '';
